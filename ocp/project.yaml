@@ -1,0 +1,850 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      openshift.io/build.name: dan-test-httpd-app-1
+      openshift.io/scc: privileged
+    creationTimestamp: null
+    labels:
+      openshift.io/build.name: dan-test-httpd-app-1
+    name: dan-test-httpd-app-1-build
+    ownerReferences:
+    - apiVersion: build.openshift.io/v1
+      controller: true
+      kind: Build
+      name: dan-test-httpd-app-1
+      uid: 27669fc1-9c03-11e8-9ff7-0800278c9f78
+  spec:
+    containers:
+    - args:
+      - --loglevel=0
+      command:
+      - openshift-sti-build
+      env:
+      - name: BUILD
+        value: |
+          {"kind":"Build","apiVersion":"v1","metadata":{"name":"dan-test-httpd-app-1","namespace":"dan-test-manual","selfLink":"/apis/build.openshift.io/v1/namespaces/dan-test-manual/builds/dan-test-httpd-app-1","uid":"27669fc1-9c03-11e8-9ff7-0800278c9f78","resourceVersion":"5147","creationTimestamp":"2018-08-09T18:36:39Z","labels":{"app":"dan-test-httpd-app","buildconfig":"dan-test-httpd-app","openshift.io/build-config.name":"dan-test-httpd-app","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"dan-test-httpd-app","openshift.io/build.number":"1"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"dan-test-httpd-app","uid":"2759815a-9c03-11e8-9ff7-0800278c9f78","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/DanPearson/httpd.git","ref":"master"}},"strategy":{"type":"Source","sourceStrategy":{"from":{"kind":"DockerImage","name":"docker.io/centos/httpd-24-centos7@sha256:e2620d100e5c7b509a82d165157e61e66b40e343a7a27b7034b895f00eed98c6"}}},"output":{"to":{"kind":"DockerImage","name":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest"},"pushSecret":{"name":"builder-dockercfg-ch8gn"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Image change","imageChangeBuild":{"imageID":"docker.io/centos/httpd-24-centos7@sha256:e2620d100e5c7b509a82d165157e61e66b40e343a7a27b7034b895f00eed98c6","fromRef":{"kind":"ImageStreamTag","namespace":"openshift","name":"httpd:2.4"}}}]},"status":{"phase":"New","outputDockerImageReference":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest","config":{"kind":"BuildConfig","namespace":"dan-test-manual","name":"dan-test-httpd-app"},"output":{}}}
+      - name: SOURCE_REPOSITORY
+        value: https://github.com/DanPearson/httpd.git
+      - name: SOURCE_URI
+        value: https://github.com/DanPearson/httpd.git
+      - name: SOURCE_REF
+        value: master
+      - name: ORIGIN_VERSION
+        value: v3.9.0+71543b2-33
+      - name: ALLOWED_UIDS
+        value: 1-
+      - name: DROP_CAPS
+        value: KILL,MKNOD,SETGID,SETUID
+      - name: PUSH_DOCKERCFG_PATH
+        value: /var/run/secrets/openshift.io/push
+      image: openshift/origin-sti-builder:v3.9.0
+      imagePullPolicy: IfNotPresent
+      name: sti-build
+      resources: {}
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: FallbackToLogsOnError
+      volumeMounts:
+      - mountPath: /tmp/build
+        name: buildworkdir
+      - mountPath: /var/run/docker.sock
+        name: docker-socket
+      - mountPath: /var/run/crio/crio.sock
+        name: crio-socket
+      - mountPath: /var/run/secrets/openshift.io/push
+        name: builder-dockercfg-ch8gn-push
+        readOnly: true
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: builder-token-k2ftr
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    imagePullSecrets:
+    - name: builder-dockercfg-ch8gn
+    initContainers:
+    - args:
+      - --loglevel=0
+      command:
+      - openshift-git-clone
+      env:
+      - name: BUILD
+        value: |
+          {"kind":"Build","apiVersion":"v1","metadata":{"name":"dan-test-httpd-app-1","namespace":"dan-test-manual","selfLink":"/apis/build.openshift.io/v1/namespaces/dan-test-manual/builds/dan-test-httpd-app-1","uid":"27669fc1-9c03-11e8-9ff7-0800278c9f78","resourceVersion":"5147","creationTimestamp":"2018-08-09T18:36:39Z","labels":{"app":"dan-test-httpd-app","buildconfig":"dan-test-httpd-app","openshift.io/build-config.name":"dan-test-httpd-app","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"dan-test-httpd-app","openshift.io/build.number":"1"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"dan-test-httpd-app","uid":"2759815a-9c03-11e8-9ff7-0800278c9f78","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/DanPearson/httpd.git","ref":"master"}},"strategy":{"type":"Source","sourceStrategy":{"from":{"kind":"DockerImage","name":"docker.io/centos/httpd-24-centos7@sha256:e2620d100e5c7b509a82d165157e61e66b40e343a7a27b7034b895f00eed98c6"}}},"output":{"to":{"kind":"DockerImage","name":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest"},"pushSecret":{"name":"builder-dockercfg-ch8gn"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Image change","imageChangeBuild":{"imageID":"docker.io/centos/httpd-24-centos7@sha256:e2620d100e5c7b509a82d165157e61e66b40e343a7a27b7034b895f00eed98c6","fromRef":{"kind":"ImageStreamTag","namespace":"openshift","name":"httpd:2.4"}}}]},"status":{"phase":"New","outputDockerImageReference":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest","config":{"kind":"BuildConfig","namespace":"dan-test-manual","name":"dan-test-httpd-app"},"output":{}}}
+      - name: SOURCE_REPOSITORY
+        value: https://github.com/DanPearson/httpd.git
+      - name: SOURCE_URI
+        value: https://github.com/DanPearson/httpd.git
+      - name: SOURCE_REF
+        value: master
+      - name: ORIGIN_VERSION
+        value: v3.9.0+71543b2-33
+      - name: ALLOWED_UIDS
+        value: 1-
+      - name: DROP_CAPS
+        value: KILL,MKNOD,SETGID,SETUID
+      image: openshift/origin-sti-builder:v3.9.0
+      imagePullPolicy: IfNotPresent
+      name: git-clone
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: FallbackToLogsOnError
+      volumeMounts:
+      - mountPath: /tmp/build
+        name: buildworkdir
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: builder-token-k2ftr
+        readOnly: true
+    - args:
+      - --loglevel=0
+      command:
+      - openshift-manage-dockerfile
+      env:
+      - name: BUILD
+        value: |
+          {"kind":"Build","apiVersion":"v1","metadata":{"name":"dan-test-httpd-app-1","namespace":"dan-test-manual","selfLink":"/apis/build.openshift.io/v1/namespaces/dan-test-manual/builds/dan-test-httpd-app-1","uid":"27669fc1-9c03-11e8-9ff7-0800278c9f78","resourceVersion":"5147","creationTimestamp":"2018-08-09T18:36:39Z","labels":{"app":"dan-test-httpd-app","buildconfig":"dan-test-httpd-app","openshift.io/build-config.name":"dan-test-httpd-app","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"dan-test-httpd-app","openshift.io/build.number":"1"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"dan-test-httpd-app","uid":"2759815a-9c03-11e8-9ff7-0800278c9f78","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/DanPearson/httpd.git","ref":"master"}},"strategy":{"type":"Source","sourceStrategy":{"from":{"kind":"DockerImage","name":"docker.io/centos/httpd-24-centos7@sha256:e2620d100e5c7b509a82d165157e61e66b40e343a7a27b7034b895f00eed98c6"}}},"output":{"to":{"kind":"DockerImage","name":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest"},"pushSecret":{"name":"builder-dockercfg-ch8gn"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Image change","imageChangeBuild":{"imageID":"docker.io/centos/httpd-24-centos7@sha256:e2620d100e5c7b509a82d165157e61e66b40e343a7a27b7034b895f00eed98c6","fromRef":{"kind":"ImageStreamTag","namespace":"openshift","name":"httpd:2.4"}}}]},"status":{"phase":"New","outputDockerImageReference":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest","config":{"kind":"BuildConfig","namespace":"dan-test-manual","name":"dan-test-httpd-app"},"output":{}}}
+      - name: SOURCE_REPOSITORY
+        value: https://github.com/DanPearson/httpd.git
+      - name: SOURCE_URI
+        value: https://github.com/DanPearson/httpd.git
+      - name: SOURCE_REF
+        value: master
+      - name: ORIGIN_VERSION
+        value: v3.9.0+71543b2-33
+      - name: ALLOWED_UIDS
+        value: 1-
+      - name: DROP_CAPS
+        value: KILL,MKNOD,SETGID,SETUID
+      image: openshift/origin-sti-builder:v3.9.0
+      imagePullPolicy: IfNotPresent
+      name: manage-dockerfile
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: FallbackToLogsOnError
+      volumeMounts:
+      - mountPath: /tmp/build
+        name: buildworkdir
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: builder-token-k2ftr
+        readOnly: true
+    nodeName: localhost
+    restartPolicy: Never
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: builder
+    serviceAccountName: builder
+    terminationGracePeriodSeconds: 30
+    volumes:
+    - emptyDir: {}
+      name: buildworkdir
+    - hostPath:
+        path: /var/run/docker.sock
+        type: ""
+      name: docker-socket
+    - hostPath:
+        path: /var/run/crio/crio.sock
+        type: ""
+      name: crio-socket
+    - name: builder-dockercfg-ch8gn-push
+      secret:
+        defaultMode: 384
+        secretName: builder-dockercfg-ch8gn
+    - name: builder-token-k2ftr
+      secret:
+        defaultMode: 420
+        secretName: builder-token-k2ftr
+  status: {}
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      openshift.io/deployment-config.latest-version: "2"
+      openshift.io/deployment-config.name: dan-test-httpd-app
+      openshift.io/deployment.name: dan-test-httpd-app-2
+      openshift.io/scc: restricted
+    creationTimestamp: null
+    generateName: dan-test-httpd-app-2-
+    labels:
+      app: dan-test-httpd-app
+      deployment: dan-test-httpd-app-2
+      deploymentconfig: dan-test-httpd-app
+    ownerReferences:
+    - apiVersion: v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicationController
+      name: dan-test-httpd-app-2
+      uid: 9e151052-9c05-11e8-9ff7-0800278c9f78
+  spec:
+    containers:
+    - image: 172.30.1.1:5000/dan-test-manual/dan-test-httpd-app@sha256:8bd718161e952012aa561fcd51c460f7c65e1728d8839f802f1c5d6aa13040d0
+      imagePullPolicy: Always
+      name: dan-test-httpd-app
+      ports:
+      - containerPort: 8080
+        protocol: TCP
+      - containerPort: 8443
+        protocol: TCP
+      resources: {}
+      securityContext:
+        capabilities:
+          drop:
+          - KILL
+          - MKNOD
+          - SETGID
+          - SETUID
+        runAsUser: 1000080000
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-4g8s6
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    imagePullSecrets:
+    - name: default-dockercfg-m4rvt
+    nodeName: localhost
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      fsGroup: 1000080000
+      seLinuxOptions:
+        level: s0:c9,c4
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    volumes:
+    - name: default-token-4g8s6
+      secret:
+        defaultMode: 420
+        secretName: default-token-4g8s6
+  status: {}
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      openshift.io/build.name: dan-test-httpd-app-2
+      openshift.io/scc: privileged
+    creationTimestamp: null
+    labels:
+      openshift.io/build.name: dan-test-httpd-app-2
+    name: dan-test-httpd-app-2-build
+    ownerReferences:
+    - apiVersion: build.openshift.io/v1
+      controller: true
+      kind: Build
+      name: dan-test-httpd-app-2
+      uid: 5fec122a-9c04-11e8-9ff7-0800278c9f78
+  spec:
+    containers:
+    - args:
+      - --loglevel=0
+      command:
+      - openshift-sti-build
+      env:
+      - name: BUILD
+        value: |
+          {"kind":"Build","apiVersion":"v1","metadata":{"name":"dan-test-httpd-app-2","namespace":"dan-test-manual","selfLink":"/apis/build.openshift.io/v1/namespaces/dan-test-manual/builds/dan-test-httpd-app-2","uid":"5fec122a-9c04-11e8-9ff7-0800278c9f78","resourceVersion":"5887","creationTimestamp":"2018-08-09T18:45:23Z","labels":{"app":"dan-test-httpd-app","buildconfig":"dan-test-httpd-app","openshift.io/build-config.name":"dan-test-httpd-app","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"dan-test-httpd-app","openshift.io/build.number":"2"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"dan-test-httpd-app","uid":"2759815a-9c03-11e8-9ff7-0800278c9f78","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/DanPearson/httpd.git","ref":"master"}},"strategy":{"type":"Source","sourceStrategy":{"from":{"kind":"DockerImage","name":"docker.io/centos/httpd-24-centos7@sha256:e2620d100e5c7b509a82d165157e61e66b40e343a7a27b7034b895f00eed98c6"}}},"output":{"to":{"kind":"DockerImage","name":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest"},"pushSecret":{"name":"builder-dockercfg-ch8gn"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Manually triggered"}]},"status":{"phase":"New","outputDockerImageReference":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest","config":{"kind":"BuildConfig","namespace":"dan-test-manual","name":"dan-test-httpd-app"},"output":{}}}
+      - name: SOURCE_REPOSITORY
+        value: https://github.com/DanPearson/httpd.git
+      - name: SOURCE_URI
+        value: https://github.com/DanPearson/httpd.git
+      - name: SOURCE_REF
+        value: master
+      - name: ORIGIN_VERSION
+        value: v3.9.0+71543b2-33
+      - name: ALLOWED_UIDS
+        value: 1-
+      - name: DROP_CAPS
+        value: KILL,MKNOD,SETGID,SETUID
+      - name: PUSH_DOCKERCFG_PATH
+        value: /var/run/secrets/openshift.io/push
+      image: openshift/origin-sti-builder:v3.9.0
+      imagePullPolicy: IfNotPresent
+      name: sti-build
+      resources: {}
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: FallbackToLogsOnError
+      volumeMounts:
+      - mountPath: /tmp/build
+        name: buildworkdir
+      - mountPath: /var/run/docker.sock
+        name: docker-socket
+      - mountPath: /var/run/crio/crio.sock
+        name: crio-socket
+      - mountPath: /var/run/secrets/openshift.io/push
+        name: builder-dockercfg-ch8gn-push
+        readOnly: true
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: builder-token-k2ftr
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    imagePullSecrets:
+    - name: builder-dockercfg-ch8gn
+    initContainers:
+    - args:
+      - --loglevel=0
+      command:
+      - openshift-git-clone
+      env:
+      - name: BUILD
+        value: |
+          {"kind":"Build","apiVersion":"v1","metadata":{"name":"dan-test-httpd-app-2","namespace":"dan-test-manual","selfLink":"/apis/build.openshift.io/v1/namespaces/dan-test-manual/builds/dan-test-httpd-app-2","uid":"5fec122a-9c04-11e8-9ff7-0800278c9f78","resourceVersion":"5887","creationTimestamp":"2018-08-09T18:45:23Z","labels":{"app":"dan-test-httpd-app","buildconfig":"dan-test-httpd-app","openshift.io/build-config.name":"dan-test-httpd-app","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"dan-test-httpd-app","openshift.io/build.number":"2"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"dan-test-httpd-app","uid":"2759815a-9c03-11e8-9ff7-0800278c9f78","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/DanPearson/httpd.git","ref":"master"}},"strategy":{"type":"Source","sourceStrategy":{"from":{"kind":"DockerImage","name":"docker.io/centos/httpd-24-centos7@sha256:e2620d100e5c7b509a82d165157e61e66b40e343a7a27b7034b895f00eed98c6"}}},"output":{"to":{"kind":"DockerImage","name":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest"},"pushSecret":{"name":"builder-dockercfg-ch8gn"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Manually triggered"}]},"status":{"phase":"New","outputDockerImageReference":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest","config":{"kind":"BuildConfig","namespace":"dan-test-manual","name":"dan-test-httpd-app"},"output":{}}}
+      - name: SOURCE_REPOSITORY
+        value: https://github.com/DanPearson/httpd.git
+      - name: SOURCE_URI
+        value: https://github.com/DanPearson/httpd.git
+      - name: SOURCE_REF
+        value: master
+      - name: ORIGIN_VERSION
+        value: v3.9.0+71543b2-33
+      - name: ALLOWED_UIDS
+        value: 1-
+      - name: DROP_CAPS
+        value: KILL,MKNOD,SETGID,SETUID
+      image: openshift/origin-sti-builder:v3.9.0
+      imagePullPolicy: IfNotPresent
+      name: git-clone
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: FallbackToLogsOnError
+      volumeMounts:
+      - mountPath: /tmp/build
+        name: buildworkdir
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: builder-token-k2ftr
+        readOnly: true
+    - args:
+      - --loglevel=0
+      command:
+      - openshift-manage-dockerfile
+      env:
+      - name: BUILD
+        value: |
+          {"kind":"Build","apiVersion":"v1","metadata":{"name":"dan-test-httpd-app-2","namespace":"dan-test-manual","selfLink":"/apis/build.openshift.io/v1/namespaces/dan-test-manual/builds/dan-test-httpd-app-2","uid":"5fec122a-9c04-11e8-9ff7-0800278c9f78","resourceVersion":"5887","creationTimestamp":"2018-08-09T18:45:23Z","labels":{"app":"dan-test-httpd-app","buildconfig":"dan-test-httpd-app","openshift.io/build-config.name":"dan-test-httpd-app","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"dan-test-httpd-app","openshift.io/build.number":"2"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"dan-test-httpd-app","uid":"2759815a-9c03-11e8-9ff7-0800278c9f78","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/DanPearson/httpd.git","ref":"master"}},"strategy":{"type":"Source","sourceStrategy":{"from":{"kind":"DockerImage","name":"docker.io/centos/httpd-24-centos7@sha256:e2620d100e5c7b509a82d165157e61e66b40e343a7a27b7034b895f00eed98c6"}}},"output":{"to":{"kind":"DockerImage","name":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest"},"pushSecret":{"name":"builder-dockercfg-ch8gn"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Manually triggered"}]},"status":{"phase":"New","outputDockerImageReference":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest","config":{"kind":"BuildConfig","namespace":"dan-test-manual","name":"dan-test-httpd-app"},"output":{}}}
+      - name: SOURCE_REPOSITORY
+        value: https://github.com/DanPearson/httpd.git
+      - name: SOURCE_URI
+        value: https://github.com/DanPearson/httpd.git
+      - name: SOURCE_REF
+        value: master
+      - name: ORIGIN_VERSION
+        value: v3.9.0+71543b2-33
+      - name: ALLOWED_UIDS
+        value: 1-
+      - name: DROP_CAPS
+        value: KILL,MKNOD,SETGID,SETUID
+      image: openshift/origin-sti-builder:v3.9.0
+      imagePullPolicy: IfNotPresent
+      name: manage-dockerfile
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: FallbackToLogsOnError
+      volumeMounts:
+      - mountPath: /tmp/build
+        name: buildworkdir
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: builder-token-k2ftr
+        readOnly: true
+    nodeName: localhost
+    restartPolicy: Never
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: builder
+    serviceAccountName: builder
+    terminationGracePeriodSeconds: 30
+    volumes:
+    - emptyDir: {}
+      name: buildworkdir
+    - hostPath:
+        path: /var/run/docker.sock
+        type: ""
+      name: docker-socket
+    - hostPath:
+        path: /var/run/crio/crio.sock
+        type: ""
+      name: crio-socket
+    - name: builder-dockercfg-ch8gn-push
+      secret:
+        defaultMode: 384
+        secretName: builder-dockercfg-ch8gn
+    - name: builder-token-k2ftr
+      secret:
+        defaultMode: 420
+        secretName: builder-token-k2ftr
+  status: {}
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/original-replicas: "1"
+      openshift.io/deployer-pod.completed-at: 2018-08-09 18:46:18 +0000 UTC
+      openshift.io/deployer-pod.created-at: 2018-08-09 18:46:14 +0000 UTC
+      openshift.io/deployer-pod.name: dan-test-httpd-app-1-deploy
+      openshift.io/deployment-config.latest-version: "1"
+      openshift.io/deployment-config.name: dan-test-httpd-app
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: "1"
+      openshift.io/deployment.status-reason: config change
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"dan-test-httpd-app","namespace":"dan-test-manual","selfLink":"/apis/apps.openshift.io/v1/namespaces/dan-test-manual/deploymentconfigs/dan-test-httpd-app","uid":"2753d13b-9c03-11e8-9ff7-0800278c9f78","resourceVersion":"5986","generation":2,"creationTimestamp":"2018-08-09T18:36:39Z","labels":{"app":"dan-test-httpd-app"},"annotations":{"openshift.io/generated-by":"OpenShiftWebConsole"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["dan-test-httpd-app"],"from":{"kind":"ImageStreamTag","namespace":"dan-test-manual","name":"dan-test-httpd-app:latest"},"lastTriggeredImage":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app@sha256:8bd718161e952012aa561fcd51c460f7c65e1728d8839f802f1c5d6aa13040d0"}},{"type":"ConfigChange"}],"replicas":1,"test":false,"selector":{"deploymentconfig":"dan-test-httpd-app"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"dan-test-httpd-app","deploymentconfig":"dan-test-httpd-app"}},"spec":{"containers":[{"name":"dan-test-httpd-app","image":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app@sha256:8bd718161e952012aa561fcd51c460f7c65e1728d8839f802f1c5d6aa13040d0","ports":[{"containerPort":8080,"protocol":"TCP"},{"containerPort":8443,"protocol":"TCP"}],"resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":1,"observedGeneration":1,"replicas":0,"updatedReplicas":0,"availableReplicas":0,"unavailableReplicas":0,"details":{"message":"config change","causes":[{"type":"ConfigChange"}]},"conditions":[{"type":"Available","status":"False","lastUpdateTime":"2018-08-09T18:36:39Z","lastTransitionTime":"2018-08-09T18:36:39Z","message":"Deployment config does not have minimum availability."}]}}
+    creationTimestamp: null
+    generation: 3
+    labels:
+      app: dan-test-httpd-app
+      openshift.io/deployment-config.name: dan-test-httpd-app
+    name: dan-test-httpd-app-1
+    ownerReferences:
+    - apiVersion: apps.openshift.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DeploymentConfig
+      name: dan-test-httpd-app
+      uid: 2753d13b-9c03-11e8-9ff7-0800278c9f78
+  spec:
+    replicas: 0
+    selector:
+      deployment: dan-test-httpd-app-1
+      deploymentconfig: dan-test-httpd-app
+    template:
+      metadata:
+        annotations:
+          openshift.io/deployment-config.latest-version: "1"
+          openshift.io/deployment-config.name: dan-test-httpd-app
+          openshift.io/deployment.name: dan-test-httpd-app-1
+        creationTimestamp: null
+        labels:
+          app: dan-test-httpd-app
+          deployment: dan-test-httpd-app-1
+          deploymentconfig: dan-test-httpd-app
+      spec:
+        containers:
+        - image: 172.30.1.1:5000/dan-test-manual/dan-test-httpd-app@sha256:8bd718161e952012aa561fcd51c460f7c65e1728d8839f802f1c5d6aa13040d0
+          imagePullPolicy: Always
+          name: dan-test-httpd-app
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      openshift.io/deployer-pod.completed-at: 2018-08-09 18:54:22 +0000 UTC
+      openshift.io/deployer-pod.created-at: 2018-08-09 18:54:17 +0000 UTC
+      openshift.io/deployer-pod.name: dan-test-httpd-app-2-deploy
+      openshift.io/deployment-config.latest-version: "2"
+      openshift.io/deployment-config.name: dan-test-httpd-app
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: ""
+      openshift.io/deployment.status-reason: manual change
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"dan-test-httpd-app","namespace":"dan-test-manual","selfLink":"/apis/apps.openshift.io/v1/namespaces/dan-test-manual/deploymentconfigs/dan-test-httpd-app","uid":"2753d13b-9c03-11e8-9ff7-0800278c9f78","resourceVersion":"6692","generation":3,"creationTimestamp":"2018-08-09T18:36:39Z","labels":{"app":"dan-test-httpd-app"},"annotations":{"openshift.io/generated-by":"OpenShiftWebConsole"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["dan-test-httpd-app"],"from":{"kind":"ImageStreamTag","namespace":"dan-test-manual","name":"dan-test-httpd-app:latest"},"lastTriggeredImage":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app@sha256:8bd718161e952012aa561fcd51c460f7c65e1728d8839f802f1c5d6aa13040d0"}},{"type":"ConfigChange"}],"replicas":1,"test":false,"selector":{"deploymentconfig":"dan-test-httpd-app"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"dan-test-httpd-app","deploymentconfig":"dan-test-httpd-app"}},"spec":{"containers":[{"name":"dan-test-httpd-app","image":"172.30.1.1:5000/dan-test-manual/dan-test-httpd-app@sha256:8bd718161e952012aa561fcd51c460f7c65e1728d8839f802f1c5d6aa13040d0","ports":[{"containerPort":8080,"protocol":"TCP"},{"containerPort":8443,"protocol":"TCP"}],"resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":2,"observedGeneration":2,"replicas":1,"updatedReplicas":1,"availableReplicas":1,"unavailableReplicas":0,"details":{"message":"manual change","causes":[{"type":"Manual"}]},"conditions":[{"type":"Available","status":"True","lastUpdateTime":"2018-08-09T18:46:17Z","lastTransitionTime":"2018-08-09T18:46:17Z","message":"Deployment config has minimum availability."},{"type":"Progressing","status":"True","lastUpdateTime":"2018-08-09T18:46:18Z","lastTransitionTime":"2018-08-09T18:46:18Z","reason":"NewReplicationControllerAvailable","message":"replication controller \"dan-test-httpd-app-1\" successfully rolled out"}],"readyReplicas":1}}
+    creationTimestamp: null
+    generation: 2
+    labels:
+      app: dan-test-httpd-app
+      openshift.io/deployment-config.name: dan-test-httpd-app
+    name: dan-test-httpd-app-2
+    ownerReferences:
+    - apiVersion: apps.openshift.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DeploymentConfig
+      name: dan-test-httpd-app
+      uid: 2753d13b-9c03-11e8-9ff7-0800278c9f78
+  spec:
+    replicas: 1
+    selector:
+      deployment: dan-test-httpd-app-2
+      deploymentconfig: dan-test-httpd-app
+    template:
+      metadata:
+        annotations:
+          openshift.io/deployment-config.latest-version: "2"
+          openshift.io/deployment-config.name: dan-test-httpd-app
+          openshift.io/deployment.name: dan-test-httpd-app-2
+        creationTimestamp: null
+        labels:
+          app: dan-test-httpd-app
+          deployment: dan-test-httpd-app-2
+          deploymentconfig: dan-test-httpd-app
+      spec:
+        containers:
+        - image: 172.30.1.1:5000/dan-test-manual/dan-test-httpd-app@sha256:8bd718161e952012aa561fcd51c460f7c65e1728d8839f802f1c5d6aa13040d0
+          imagePullPolicy: Always
+          name: dan-test-httpd-app
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    creationTimestamp: null
+    labels:
+      app: dan-test-httpd-app
+    name: dan-test-httpd-app
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      deploymentconfig: dan-test-httpd-app
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    creationTimestamp: null
+    generation: 3
+    labels:
+      app: dan-test-httpd-app
+    name: dan-test-httpd-app
+  spec:
+    replicas: 1
+    selector:
+      deploymentconfig: dan-test-httpd-app
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: dan-test-httpd-app
+          deploymentconfig: dan-test-httpd-app
+      spec:
+        containers:
+        - image: 172.30.1.1:5000/dan-test-manual/dan-test-httpd-app@sha256:8bd718161e952012aa561fcd51c460f7c65e1728d8839f802f1c5d6aa13040d0
+          imagePullPolicy: Always
+          name: dan-test-httpd-app
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - dan-test-httpd-app
+        from:
+          kind: ImageStreamTag
+          name: dan-test-httpd-app:latest
+          namespace: dan-test-manual
+        lastTriggeredImage: 172.30.1.1:5000/dan-test-manual/dan-test-httpd-app@sha256:8bd718161e952012aa561fcd51c460f7c65e1728d8839f802f1c5d6aa13040d0
+      type: ImageChange
+    - type: ConfigChange
+  status:
+    availableReplicas: 0
+    latestVersion: 0
+    observedGeneration: 0
+    replicas: 0
+    unavailableReplicas: 0
+    updatedReplicas: 0
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    creationTimestamp: null
+    labels:
+      app: dan-test-httpd-app
+    name: dan-test-httpd-app
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: dan-test-httpd-app:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      git:
+        ref: master
+        uri: https://github.com/DanPearson/httpd.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: httpd:2.4
+          namespace: openshift
+      type: Source
+    triggers:
+    - imageChange: {}
+      type: ImageChange
+    - type: ConfigChange
+    - generic:
+        secret: aecde188a350ee88
+      type: Generic
+    - github:
+        secret: 22c9dfa4690c5139
+      type: GitHub
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: Build
+  metadata:
+    annotations:
+      openshift.io/build-config.name: dan-test-httpd-app
+      openshift.io/build.number: "1"
+      openshift.io/build.pod-name: dan-test-httpd-app-1-build
+    creationTimestamp: null
+    labels:
+      app: dan-test-httpd-app
+      buildconfig: dan-test-httpd-app
+      openshift.io/build-config.name: dan-test-httpd-app
+      openshift.io/build.start-policy: Serial
+    name: dan-test-httpd-app-1
+    ownerReferences:
+    - apiVersion: build.openshift.io/v1
+      controller: true
+      kind: BuildConfig
+      name: dan-test-httpd-app
+      uid: 2759815a-9c03-11e8-9ff7-0800278c9f78
+  spec:
+    nodeSelector: null
+    output:
+      pushSecret:
+        name: builder-dockercfg-ch8gn
+      to:
+        kind: ImageStreamTag
+        name: dan-test-httpd-app:latest
+    postCommit: {}
+    resources: {}
+    serviceAccount: builder
+    source:
+      git:
+        ref: master
+        uri: https://github.com/DanPearson/httpd.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: DockerImage
+          name: docker.io/centos/httpd-24-centos7@sha256:e2620d100e5c7b509a82d165157e61e66b40e343a7a27b7034b895f00eed98c6
+      type: Source
+    triggeredBy:
+    - imageChangeBuild:
+        fromRef:
+          kind: ImageStreamTag
+          name: httpd:2.4
+          namespace: openshift
+        imageID: docker.io/centos/httpd-24-centos7@sha256:e2620d100e5c7b509a82d165157e61e66b40e343a7a27b7034b895f00eed98c6
+      message: Image change
+  status:
+    config:
+      name: dan-test-httpd-app
+    message: Failed to fetch the input source.
+    output: {}
+    outputDockerImageReference: 172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest
+    phase: New
+    reason: FetchSourceFailed
+    stages:
+    - durationMilliseconds: 1499
+      name: FetchInputs
+      startTime: 2018-08-09T18:36:49Z
+      steps:
+      - durationMilliseconds: 1499
+        name: FetchGitSource
+        startTime: 2018-08-09T18:36:49Z
+- apiVersion: v1
+  kind: Build
+  metadata:
+    annotations:
+      openshift.io/build-config.name: dan-test-httpd-app
+      openshift.io/build.number: "2"
+      openshift.io/build.pod-name: dan-test-httpd-app-2-build
+    creationTimestamp: null
+    labels:
+      app: dan-test-httpd-app
+      buildconfig: dan-test-httpd-app
+      openshift.io/build-config.name: dan-test-httpd-app
+      openshift.io/build.start-policy: Serial
+    name: dan-test-httpd-app-2
+    ownerReferences:
+    - apiVersion: build.openshift.io/v1
+      controller: true
+      kind: BuildConfig
+      name: dan-test-httpd-app
+      uid: 2759815a-9c03-11e8-9ff7-0800278c9f78
+  spec:
+    nodeSelector: null
+    output:
+      pushSecret:
+        name: builder-dockercfg-ch8gn
+      to:
+        kind: ImageStreamTag
+        name: dan-test-httpd-app:latest
+    postCommit: {}
+    resources: {}
+    revision:
+      git:
+        author:
+          email: danny@dannypearson.com
+          name: dannypearson
+        commit: a1362315991427b5b2bf6bfefc330d34a185b1de
+        committer:
+          email: danny@dannypearson.com
+          name: dannypearson
+        message: first commit
+      type: Git
+    serviceAccount: builder
+    source:
+      git:
+        ref: master
+        uri: https://github.com/DanPearson/httpd.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: DockerImage
+          name: docker.io/centos/httpd-24-centos7@sha256:e2620d100e5c7b509a82d165157e61e66b40e343a7a27b7034b895f00eed98c6
+      type: Source
+    triggeredBy:
+    - message: Manually triggered
+  status:
+    config:
+      name: dan-test-httpd-app
+    output:
+      to:
+        imageDigest: sha256:8bd718161e952012aa561fcd51c460f7c65e1728d8839f802f1c5d6aa13040d0
+    outputDockerImageReference: 172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest
+    phase: New
+    stages:
+    - durationMilliseconds: 3566
+      name: FetchInputs
+      startTime: 2018-08-09T18:45:26Z
+      steps:
+      - durationMilliseconds: 3566
+        name: FetchGitSource
+        startTime: 2018-08-09T18:45:26Z
+    - durationMilliseconds: 162
+      name: CommitContainer
+      startTime: 2018-08-09T18:45:55Z
+      steps:
+      - durationMilliseconds: 162
+        name: CommitContainer
+        startTime: 2018-08-09T18:45:55Z
+    - durationMilliseconds: 701
+      name: Assemble
+      startTime: 2018-08-09T18:45:54Z
+      steps:
+      - durationMilliseconds: 701
+        name: AssembleBuildScripts
+        startTime: 2018-08-09T18:45:54Z
+    - durationMilliseconds: 18773
+      name: PushImage
+      startTime: 2018-08-09T18:45:55Z
+      steps:
+      - durationMilliseconds: 18773
+        name: PushImage
+        startTime: 2018-08-09T18:45:55Z
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: dan-test-httpd-app
+    name: dan-test-httpd-app
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations: null
+      from:
+        kind: DockerImage
+        name: 172.30.1.1:5000/dan-test-manual/dan-test-httpd-app:latest
+      generation: null
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: ""
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: Route
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+      openshift.io/host.generated: "true"
+    creationTimestamp: null
+    labels:
+      app: dan-test-httpd-app
+    name: dan-test-httpd-app
+  spec:
+    host: dan-test-httpd-app-dan-test-manual.192.168.99.100.nip.io
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: dan-test-httpd-app
+      weight: 100
+    wildcardPolicy: None
+  status:
+    ingress:
+    - conditions:
+      - lastTransitionTime: 2018-08-09T18:36:39Z
+        status: "True"
+        type: Admitted
+      host: dan-test-httpd-app-dan-test-manual.192.168.99.100.nip.io
+      routerName: router
+      wildcardPolicy: None
+kind: List
+metadata: {}

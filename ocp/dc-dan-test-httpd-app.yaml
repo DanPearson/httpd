@@ -1,0 +1,93 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftWebConsole
+  creationTimestamp: '2018-08-11T22:15:25Z'
+  generation: 2
+  labels:
+    app: dev2-dan-test-auto
+  name: dev2-dan-test-auto
+  namespace: dev2-dan-test-auto
+  resourceVersion: '2805'
+  selfLink: >-
+    /apis/apps.openshift.io/v1/namespaces/dev-dan-manual/deploymentconfigs/dev2-dan-test-auto
+  uid: 0bfcde67-9db4-11e8-8b0b-0800271b0c62
+spec:
+  replicas: 1
+  selector:
+    deploymentconfig: dev2-dan-test-auto
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: dev2-dan-test-auto
+        deploymentconfig: dev2-dan-test-auto
+    spec:
+      containers:
+        - image: >-
+            172.30.1.1:5000/dev-dan-manual/dev2-dan-test-auto@sha256:fb1286aaf0f0bb848e2e83518bb7a688da2894ba27c341ea8d5b5f0dc9f12324
+          imagePullPolicy: Always
+          name: dev2-dan-test-auto
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - dev2-dan-test-auto
+        from:
+          kind: ImageStreamTag
+          name: 'dev2-dan-test-auto:latest'
+          namespace: dev-dan-manual
+        lastTriggeredImage: >-
+          172.30.1.1:5000/dev-dan-manual/dev2-dan-test-auto@sha256:fb1286aaf0f0bb848e2e83518bb7a688da2894ba27c341ea8d5b5f0dc9f12324
+      type: ImageChange
+    - type: ConfigChange
+status:
+  availableReplicas: 1
+  conditions:
+    - lastTransitionTime: '2018-08-11T22:15:50Z'
+      lastUpdateTime: '2018-08-11T22:15:50Z'
+      message: Deployment config has minimum availability.
+      status: 'True'
+      type: Available
+    - lastTransitionTime: '2018-08-11T22:15:49Z'
+      lastUpdateTime: '2018-08-11T22:15:51Z'
+      message: replication controller "dev2-dan-test-auto-1" successfully rolled out
+      reason: NewReplicationControllerAvailable
+      status: 'True'
+      type: Progressing
+  details:
+    causes:
+      - type: ConfigChange
+    message: config change
+  latestVersion: 1
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 1
+  unavailableReplicas: 0
+  updatedReplicas: 1
+

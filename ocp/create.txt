@@ -1,0 +1,2 @@
+oc new-project dev-dan-test-auto
+oc new-project dev-dan-test-auto

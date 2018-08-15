@@ -1,0 +1,46 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftWebConsole
+  creationTimestamp: '2018-08-09T18:36:39Z'
+  labels:
+    app: dan-test-httpd-app
+  name: dev2-dan-test-httpd-app
+  namespace: dev2-dan-test-auto
+  resourceVersion: '5886'
+  selfLink: >-
+    /apis/build.openshift.io/v1/namespaces/dev2-dan-test-auto/buildconfigs/dan-test-httpd-app
+  uid: 2759815a-9c03-11e8-9ff7-0800278c9f78
+spec:
+  nodeSelector: null
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    git:
+      ref: master
+      uri: 'https://github.com/DanPearson/httpd.git'
+    type: Git
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: 'httpd:2.4'
+        namespace: openshift
+    type: Source
+  triggers:
+    - imageChange:
+        lastTriggeredImageID: >-
+          docker.io/centos/httpd-24-centos7@sha256:e2620d100e5c7b509a82d165157e61e66b40e343a7a27b7034b895f00eed98c6
+      type: ImageChange
+    - type: ConfigChange
+    - generic:
+        secret: aecde188a350ee88
+      type: Generic
+    - github:
+        secret: 22c9dfa4690c5139
+      type: GitHub
+status:
+  lastVersion: 2
+

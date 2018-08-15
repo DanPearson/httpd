@@ -1,5 +1,5 @@
 #!/usr/bin/groovy
-@Library('pipeline-library')_
+//@Library('pipeline-library')_
 
 def imageStreamName = 'css-aws-integration'
 def buildConfigName = 'css-aws-integration'

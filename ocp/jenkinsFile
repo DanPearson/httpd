@@ -14,13 +14,13 @@ node('scala') {
 currentBuild.displayName = "${env.NMSPACE}-${env.NEXUS_VER}"  
 if ("${env.NEXUS_REPO}" == 'maven-snapshots')           
 {
-  url = "https://nexus.localhost/repository/${env.NEXUS_REPO}/com/worldpay/css-aws-integration/${env.NEXUS_VER}/maven-metadata.xml"       
+  url = "https://nexus.localhost/repository/${env.NEXUS_REPO}/com/css-aws-integration/${env.NEXUS_VER}/maven-metadata.xml"       
   snap = snapshotVersion url            
   echo "snap = ${snap}"
 }           
 if ("${env.BRANCHNM}" != "")
 {
-    checkout([$class: 'GitSCM', branches: [[name: "*/${env.BRANCHNM}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'f1:1b:b7:47:c2:d8:14:e0:36:fe:ed:b1:7b:2f:a8:c8', name: 'origin', refspec: "+refs/heads/${env.BRANCHNM}:refs/remotes/origin/${env.BRANCHNM}", url: 'https://github.devops.worldpay.local/css-aws-integration/css-aws-integration.git']]])
+    checkout([$class: 'GitSCM', branches: [[name: "*/${env.BRANCHNM}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'f1:1b:b7:47:c2:d8:14:e0:36:fe:ed:b1:7b:2f:a8:c8', name: 'origin', refspec: "+refs/heads/${env.BRANCHNM}:refs/remotes/origin/${env.BRANCHNM}", url: 'https://github.local/css-aws-integration/css-aws-integration.git']]])
 }
 
 try{
@@ -75,7 +75,7 @@ try{
            
             def version = ("${env.NEXUS_REPO}" == 'maven-snapshots') ? snap : "${env.NEXUS_VER}" 
             echo "${groupId} is group, ${snap} is latest snap, ${version} is version "
-            sh "oc start-build ${buildConfigName} --follow -n ${buildNamespace} --env=APP_DOWNLOAD_URL=https://nexus-ci.apps-build.ew1.aws.worldpay.local/repository/${env.NEXUS_REPO}/com/worldpay/css-aws-integration/${env.NEXUS_VER}/css-aws-integration-${version}.jar --env=APP_VERSION=${version}"
+            sh "oc start-build ${buildConfigName} --follow -n ${buildNamespace} --env=APP_DOWNLOAD_URL=https://nexus.localhost/repository/${env.NEXUS_REPO}/com/css-aws-integration/${env.NEXUS_VER}/css-aws-integration-${version}.jar --env=APP_VERSION=${version}"
             openshiftTag(namespace: buildNamespace, sourceStream: imageStreamName, sourceTag: 'latest', destinationStream: imageStreamName, destinationTag: "${version}")
             openshiftTag(namespace: buildNamespace, sourceStream: imageStreamName, sourceTag: 'latest', destinationStream: imageStreamName, destinationTag: "${env.NEXUS_VER}")
             println "OpenShift build tagged with ${env.BRANCHNM}"

@@ -1,0 +1,99 @@
+#!/usr/bin/groovy
+@Library('pipeline-library')_
+
+def imageStreamName = 'css-aws-integration'
+def buildConfigName = 'css-aws-integration'
+def deploymentConfigName = 'css-aws-integration'
+def buildNamespace = "${env.NMSPACE}"
+def url = 'https://nexus-ci.apps-build.ew1.aws.worldpay.local/repository/'
+def newNamespace = false
+def snap
+def ocpEnv = 'https://ocp-build.ew1.aws.worldpay.local:443'
+
+node('scala') {
+currentBuild.displayName = "${env.NMSPACE}-${env.NEXUS_VER}"  
+if ("${env.NEXUS_REPO}" == 'maven-snapshots')           
+{
+  url = "https://nexus-ci.apps-build.ew1.aws.worldpay.local/repository/${env.NEXUS_REPO}/com/worldpay/css-aws-integration/${env.NEXUS_VER}/maven-metadata.xml"       
+  snap = snapshotVersion url            
+  echo "snap = ${snap}"
+}           
+if ("${env.BRANCHNM}" != "")
+{
+    checkout([$class: 'GitSCM', branches: [[name: "*/${env.BRANCHNM}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'f1:1b:b7:47:c2:d8:14:e0:36:fe:ed:b1:7b:2f:a8:c8', name: 'origin', refspec: "+refs/heads/${env.BRANCHNM}:refs/remotes/origin/${env.BRANCHNM}", url: 'https://github.devops.worldpay.local/css-aws-integration/css-aws-integration.git']]])
+}
+
+try{
+    try{
+        withCredentials([string(credentialsId: 'cicd', variable: 'PAWO')]) {
+          if ("${env.OCPENV}" != "")
+             ocpEnv = "${env.OCPENV}"
+          sh "oc login ${ocpEnv} --token=${PAWO}"
+          sh "oc project ${buildNamespace}"
+        }
+
+    } catch (err) {
+        stage('OpenShift create project') {
+            echo "As the project does not exist on openshift, we will create it"
+            sh "oc new-project ${env.NMSPACE}"
+            newNamespace = true
+            sh "oc project ${env.NMSPACE}"
+            withCredentials([string(credentialsId: 'ocp-secret-encrypt', variable: 'OCP_SECRET')]) {
+                sh ''' openssl enc -d -aes-256-cbc -a -in ocp/enc-commonenv-secret.yml -out ocp/commonenv-secret.yml -k ${OCP_SECRET} '''
+                sh " oc process -f ocp/commonenv-secret.yml| oc create -n ${env.NMSPACE} -f - "
+            }
+            // please don't add IMGTAG_NAME for common.yml and build.yml
+            sh "oc process -f ocp/common.yml NMSPACE=${env.NMSPACE} BRANCH_NAME_HY=${env.BRANCHNM} CLUSTER_NAME=build | oc create -n ${env.NMSPACE} -f -"
+            sh "oc process -f ocp/build.yml NMSPACE=${env.NMSPACE} BRANCH_NAME_HY=${env.BRANCHNM} CLUSTER_NAME=build  | oc create -n ${env.NMSPACE} -f -"
+            sh "oc process -f ocp/deployment.yml NMSPACE=${env.NMSPACE} BRANCH_NAME_HY=${env.BRANCHNM} CLUSTER_NAME=build IMGTAG_NAME=${env.NEXUS_VER} | oc create -n ${env.NMSPACE} -f -"
+            sh "oc process -f ocp/configMap.yml | oc create -n ${env.NMSPACE} -f -"
+            echo "Resources (is,bc,dc,svc,secret,route) created under OCP namespace ${env.NMSPACE}"
+
+            sh "oc policy add-role-to-group admin r-docet-devtool-admin -n ${env.NMSPACE}"
+            sh "oc policy add-role-to-group view r-docet-devtool-user -n ${env.NMSPACE}"
+            sh "oc policy add-role-to-user admin system:serviceaccount:ci:jenkins -n ${env.NMSPACE}"
+            sh "oc policy add-role-to-user admin system:serviceaccount:ci:cicd -n ${env.NMSPACE}"
+        }
+    }
+
+    if ("${env.OCP_ACTION}" == "buildAndDeploy") {
+        if (!newNamespace) {
+            stage('Re-create buildconfig') {
+                withCredentials([string(credentialsId: 'ocp-secret-encrypt', variable: 'OCP_SECRET')]) {
+                    sh ''' openssl enc -d -aes-256-cbc -a -in ocp/enc-commonenv-secret.yml -out ocp/commonenv-secret.yml -k ${OCP_SECRET} '''
+                    sh " oc process -f ocp/commonenv-secret.yml| oc replace -n ${env.NMSPACE} -f - "
+                }
+                // please don't add IMGTAG_NAME for common.yml and build.yml
+                sh "oc process -f ocp/build.yml NMSPACE=${env.NMSPACE} BRANCH_NAME_HY=${env.BRANCHNM} CLUSTER_NAME=build  | oc replace -n ${env.NMSPACE} -f -"
+                sh "oc process -f ocp/deployment.yml NMSPACE=${env.NMSPACE} BRANCH_NAME_HY=${env.BRANCHNM} CLUSTER_NAME=build IMGTAG_NAME=${env.NEXUS_VER} | oc replace -n ${env.NMSPACE} -f -"
+                sh "oc process -f ocp/configMap.yml | oc replace -n ${env.NMSPACE} -f -" 
+            }
+        }
+        stage('OCP Build, tag, deploy') {
+            def pom = readMavenPom()
+            def groupId = "${pom.groupId}".replace(".", "/")
+           
+            def version = ("${env.NEXUS_REPO}" == 'maven-snapshots') ? snap : "${env.NEXUS_VER}" 
+            echo "${groupId} is group, ${snap} is latest snap, ${version} is version "
+            sh "oc start-build ${buildConfigName} --follow -n ${buildNamespace} --env=APP_DOWNLOAD_URL=https://nexus-ci.apps-build.ew1.aws.worldpay.local/repository/${env.NEXUS_REPO}/com/worldpay/css-aws-integration/${env.NEXUS_VER}/css-aws-integration-${version}.jar --env=APP_VERSION=${version}"
+            openshiftTag(namespace: buildNamespace, sourceStream: imageStreamName, sourceTag: 'latest', destinationStream: imageStreamName, destinationTag: "${version}")
+            openshiftTag(namespace: buildNamespace, sourceStream: imageStreamName, sourceTag: 'latest', destinationStream: imageStreamName, destinationTag: "${env.NEXUS_VER}")
+            println "OpenShift build tagged with ${env.BRANCHNM}"
+            openshiftDeploy deploymentConfig: deploymentConfigName, namespace: buildNamespace
+        }
+    } else {
+        stage('OCP Deploy') {
+            echo "This will deploy an existing registry image without doing the oc start-build step"
+            echo "nexus ver = ${env.NEXUS_VER}"
+            sh "oc patch deploymentconfig css-aws-integration -p '[{\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/image\", \"value\": \"docker-registry.default.svc:5000/${env.NMSPACE}/css-aws-integration:${env.NEXUS_VER}\"}]' --type=json"
+            openshiftDeploy deploymentConfig: deploymentConfigName, namespace: buildNamespace
+        }
+    }
+    sleep 15
+    } catch(err){
+        stage('Slack notification') {
+            slackSend color: 'warning', message: "FAILED Build: ${env.BUILD_URL}"
+            throw err
+        }
+    }
+}

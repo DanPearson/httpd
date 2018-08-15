@@ -5,16 +5,16 @@ def imageStreamName = 'css-aws-integration'
 def buildConfigName = 'css-aws-integration'
 def deploymentConfigName = 'css-aws-integration'
 def buildNamespace = "${env.NMSPACE}"
-def url = 'https://nexus-ci.apps-build.ew1.aws.worldpay.local/repository/'
+def url = 'https://nexus.localhost/repository/'
 def newNamespace = false
 def snap
-def ocpEnv = 'https://ocp-build.ew1.aws.worldpay.local:443'
+def ocpEnv = 'https://localhost:443'
 
 node('scala') {
 currentBuild.displayName = "${env.NMSPACE}-${env.NEXUS_VER}"  
 if ("${env.NEXUS_REPO}" == 'maven-snapshots')           
 {
-  url = "https://nexus-ci.apps-build.ew1.aws.worldpay.local/repository/${env.NEXUS_REPO}/com/worldpay/css-aws-integration/${env.NEXUS_VER}/maven-metadata.xml"       
+  url = "https://nexus.localhost/repository/${env.NEXUS_REPO}/com/worldpay/css-aws-integration/${env.NEXUS_VER}/maven-metadata.xml"       
   snap = snapshotVersion url            
   echo "snap = ${snap}"
 }           
